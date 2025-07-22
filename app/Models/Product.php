@@ -21,4 +21,14 @@ class Product extends Model
     {
         return $this->hasMany(InventoryMovement::class);
     }
+
+    public function scopeFilter($query, array $filters){
+       if($filters['search'] ?? false){
+            $query->where('product_name', 'like', '%' . request('search') . '%');
+       }
+
+       if($filters['category_id'] ?? false){
+            $query->where('category_id', request('category_id'));
+       }
+    }
 }

@@ -13,10 +13,18 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('category')->latest()->paginate(2);
-        return inertia('Product/Index', ['products' => $products]);
+        $categories = Category::select('id', 'name')->get();
+        $products = Product::with('category')
+        ->filter(request(['search', 'category_id'])) // call the scope filter in the model
+        ->latest()
+        ->paginate(2)
+        ->withQueryString(); // to keep the search query in the url
+        return inertia('Product/Index', [
+            'products' => $products,
+            'categories' => $categories
+        ]);
     }
 
     /**
@@ -32,15 +40,9 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
-        $validated = $request->validate([
-            'product_name' => 'required',
-            'product_description' => 'nullable|min:5|max:255',
-            'category_id' => 'required',
-            'quantity' => 'required|numeric|min:1',
-            'price' => 'required|min:1',
-        ],['category_id.required' => 'Category field is required']);
+        $validated = $request->validated();
 
         Product::create($validated);
 

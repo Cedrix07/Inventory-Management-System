@@ -23,7 +23,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 
-
 const props = defineProps<{
     categories: Category[];
 }>();
